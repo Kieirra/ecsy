@@ -88,12 +88,12 @@ export function enableRemoteDevtools(remoteId) {
     peer.on("open", (/* id */) => {
       peer.on("connection", connection => {
         window.__ECSY_REMOTE_DEVTOOLS.connection = connection;
-        connection.on("open", function() {
+        connection.on("open", function () {
           // infoDiv.style.visibility = "hidden";
           infoDiv.innerHTML = "Connected";
 
           // Receive messages
-          connection.on("data", function(data) {
+          connection.on("data", function (data) {
             if (data.type === "init") {
               var script = document.createElement("script");
               script.setAttribute("type", "text/javascript");
@@ -139,9 +139,11 @@ export function enableRemoteDevtools(remoteId) {
   );
 }
 
-const urlParams = new URLSearchParams(window.location.search);
+if (typeof window !== "undefined") {
+  const urlParams = new URLSearchParams(window.location.search);
 
-// @todo Provide a way to disable it if needed
-if (urlParams.has("enable-remote-devtools")) {
-  enableRemoteDevtools();
+  // @todo Provide a way to disable it if needed
+  if (urlParams.has("enable-remote-devtools")) {
+    enableRemoteDevtools();
+  }
 }
