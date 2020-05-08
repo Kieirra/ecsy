@@ -23,7 +23,7 @@ export class World {
       window.dispatchEvent(event);
     }
 
-    this.lastTime = performance.now();
+    this.lastTime = Date.now();
   }
 
   registerComponent(Component) {
