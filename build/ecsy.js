@@ -18,9 +18,7 @@
 	  }
 
 	  registerSystem(System, attributes) {
-	    if (
-	      this._systems.find(s => s.constructor.name === System.name) !== undefined
-	    ) {
+	    if (this.getSystem(System) !== undefined) {
 	      console.warn(`System '${System.name}' already registered.`);
 	      return this;
 	    }
@@ -350,7 +348,7 @@
 
 	    this.alive = false;
 
-	    //if there are state components on a entity, it can't be removed
+	    //if there are state components on a entity, it can't be removed completely
 	    this.numStateComponents = 0;
 	  }
 
@@ -403,8 +401,8 @@
 	    return this;
 	  }
 
-	  removeComponent(Component, forceRemove) {
-	    this._world.entityRemoveComponent(this, Component, forceRemove);
+	  removeComponent(Component, forceImmediate) {
+	    this._world.entityRemoveComponent(this, Component, forceImmediate);
 	    return this;
 	  }
 
@@ -433,8 +431,8 @@
 	    return false;
 	  }
 
-	  removeAllComponents(forceRemove) {
-	    return this._world.entityRemoveAllComponents(this, forceRemove);
+	  removeAllComponents(forceImmediate) {
+	    return this._world.entityRemoveAllComponents(this, forceImmediate);
 	  }
 
 	  // EXTRAS
@@ -448,8 +446,8 @@
 	    this._components = {};
 	  }
 
-	  remove(forceRemove) {
-	    return this._world.removeEntity(this, forceRemove);
+	  remove(forceImmediate) {
+	    return this._world.removeEntity(this, forceImmediate);
 	  }
 	}
 
@@ -1082,6 +1080,9 @@
 
 	const Version = pjson.version;
 
+	const hasWindow = typeof window !== "undefined";
+	const hasCustomEvent = typeof CustomEvent !== "undefined";
+
 	class World {
 	  constructor() {
 	    this.componentsManager = new ComponentManager(this);
@@ -1092,7 +1093,7 @@
 
 	    this.eventQueues = {};
 
-	    if (typeof CustomEvent !== "undefined") {
+	    if (hasWindow && hasCustomEvent) {
 	      var event = new CustomEvent("ecsy-world-created", {
 	        detail: { world: this, version: Version }
 	      });
@@ -1699,12 +1700,12 @@
 	    peer.on("open", (/* id */) => {
 	      peer.on("connection", connection => {
 	        window.__ECSY_REMOTE_DEVTOOLS.connection = connection;
-	        connection.on("open", function() {
+	        connection.on("open", function () {
 	          // infoDiv.style.visibility = "hidden";
 	          infoDiv.innerHTML = "Connected";
 
 	          // Receive messages
-	          connection.on("data", function(data) {
+	          connection.on("data", function (data) {
 	            if (data.type === "init") {
 	              var script = document.createElement("script");
 	              script.setAttribute("type", "text/javascript");
@@ -1750,11 +1751,13 @@
 	  );
 	}
 
-	const urlParams = new URLSearchParams(window.location.search);
+	if (typeof window !== "undefined") {
+	  const urlParams = new URLSearchParams(window.location.search);
 
-	// @todo Provide a way to disable it if needed
-	if (urlParams.has("enable-remote-devtools")) {
-	  enableRemoteDevtools();
+	  // @todo Provide a way to disable it if needed
+	  if (urlParams.has("enable-remote-devtools")) {
+	    enableRemoteDevtools();
+	  }
 	}
 
 	exports.Component = Component;
