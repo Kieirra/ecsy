@@ -1055,6 +1055,9 @@ var pjson = {
 
 const Version = pjson.version;
 
+const hasWindow = typeof window !== "undefined";
+const hasCustomEvent = typeof CustomEvent !== "undefined";
+
 class World {
   constructor() {
     this.componentsManager = new ComponentManager(this);
@@ -1065,14 +1068,14 @@ class World {
 
     this.eventQueues = {};
 
-    if (typeof CustomEvent !== "undefined") {
+    if (hasWindow && hasCustomEvent) {
       var event = new CustomEvent("ecsy-world-created", {
         detail: { world: this, version: Version }
       });
       window.dispatchEvent(event);
     }
 
-    this.lastTime = performance.now();
+    this.lastTime = Date.now();
   }
 
   registerComponent(Component) {
@@ -1672,12 +1675,12 @@ function enableRemoteDevtools(remoteId) {
     peer.on("open", (/* id */) => {
       peer.on("connection", connection => {
         window.__ECSY_REMOTE_DEVTOOLS.connection = connection;
-        connection.on("open", function() {
+        connection.on("open", function () {
           // infoDiv.style.visibility = "hidden";
           infoDiv.innerHTML = "Connected";
 
           // Receive messages
-          connection.on("data", function(data) {
+          connection.on("data", function (data) {
             if (data.type === "init") {
               var script = document.createElement("script");
               script.setAttribute("type", "text/javascript");
@@ -1723,11 +1726,13 @@ function enableRemoteDevtools(remoteId) {
   );
 }
 
-const urlParams = new URLSearchParams(window.location.search);
+if (typeof window !== "undefined") {
+  const urlParams = new URLSearchParams(window.location.search);
 
-// @todo Provide a way to disable it if needed
-if (urlParams.has("enable-remote-devtools")) {
-  enableRemoteDevtools();
+  // @todo Provide a way to disable it if needed
+  if (urlParams.has("enable-remote-devtools")) {
+    enableRemoteDevtools();
+  }
 }
 
 export { Component, Not, System, SystemStateComponent, TagComponent, Types, Version, World, createComponentClass, createType, enableRemoteDevtools };
