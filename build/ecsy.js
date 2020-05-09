@@ -1746,6 +1746,7 @@
 	  }
 	}
 
+	exports.Entity = Entity;
 	exports.Component = Component;
 	exports.Not = Not;
 	exports.System = System;
