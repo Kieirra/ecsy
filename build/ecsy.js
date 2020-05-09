@@ -974,7 +974,7 @@
 	var module = "build/ecsy.module.js";
 	var types = "src/index.d.ts";
 	var scripts = {
-		build: "rollup -c && npm run docs",
+		build: "rollup -c",
 		docs: "rm docs/api/_sidebar.md; typedoc --readme none --mode file --excludeExternals --plugin typedoc-plugin-markdown  --theme docs/theme --hideSources --hideBreadcrumbs --out docs/api/ --includeDeclarations --includes 'src/**/*.d.ts' src; touch docs/api/_sidebar.md",
 		"dev:docs": "nodemon -e ts -x 'npm run docs' -w src",
 		dev: "concurrently --names 'ROLLUP,DOCS,HTTP' -c 'bgBlue.bold,bgYellow.bold,bgGreen.bold' 'rollup -c -w -m inline' 'npm run dev:docs' 'npm run dev:server'",
