@@ -7,9 +7,7 @@ class SystemManager {
   }
 
   registerSystem(System, attributes) {
-    if (
-      this._systems.find(s => s.constructor.name === System.name) !== undefined
-    ) {
+    if (this.getSystem(System) !== undefined) {
       console.warn(`System '${System.name}' already registered.`);
       return this;
     }
@@ -339,7 +337,7 @@ class Entity {
 
     this.alive = false;
 
-    //if there are state components on a entity, it can't be removed
+    //if there are state components on a entity, it can't be removed completely
     this.numStateComponents = 0;
   }
 
@@ -392,8 +390,8 @@ class Entity {
     return this;
   }
 
-  removeComponent(Component, forceRemove) {
-    this._world.entityRemoveComponent(this, Component, forceRemove);
+  removeComponent(Component, forceImmediate) {
+    this._world.entityRemoveComponent(this, Component, forceImmediate);
     return this;
   }
 
@@ -422,8 +420,8 @@ class Entity {
     return false;
   }
 
-  removeAllComponents(forceRemove) {
-    return this._world.entityRemoveAllComponents(this, forceRemove);
+  removeAllComponents(forceImmediate) {
+    return this._world.entityRemoveAllComponents(this, forceImmediate);
   }
 
   // EXTRAS
@@ -437,8 +435,8 @@ class Entity {
     this._components = {};
   }
 
-  remove(forceRemove) {
-    return this._world.removeEntity(this, forceRemove);
+  remove(forceImmediate) {
+    return this._world.removeEntity(this, forceImmediate);
   }
 }
 
